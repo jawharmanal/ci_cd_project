@@ -13,6 +13,8 @@ jobs:
       # Étape 1 : Récupération du code
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Requis pour une meilleure analyse SonarCloud
 
       # Étape 2 : Configuration de Python
       - name: Set up Python
@@ -48,17 +50,12 @@ jobs:
         run: docker run --rm ci_cd_project
 
       # Étape 8 : Analyse SonarCloud
-      - name: SonarQube analysis
-        uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.organization=jawharmanal
-            -Dsonar.projectKey=ci_cd_project
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Étape 9 : Déploiement simulé
+      # Étape 9 : Déploiement simulé (si tout est valide)
       - name: Deploy (simulation)
         if: success()
         run: echo "✅ Déploiement simulé après validation complète du pipeline."
