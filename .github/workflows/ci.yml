@@ -27,26 +27,27 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov flake8
 
-      # Étape 4 : Vérification des normes PEP8
+      # Étape 4 : Vérification du style de code (PEP8)
       - name: Lint (PEP8)
         run: |
           flake8 . --count --exit-zero --max-complexity=10 --statistics
 
       # Étape 5 : Exécution des tests unitaires + couverture
       - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest --maxfail=1 --disable-warnings --cov=app --cov-report=xml -q
-        working-directory: .
 
       # Étape 6 : Construction de l'image Docker
       - name: Build Docker image
         run: docker build -t ci_cd_project .
 
-      # Étape 7 : Test de l'image Docker
+      # Étape 7 : Exécution du conteneur Docker pour test
       - name: Run Docker container
         run: docker run --rm ci_cd_project
 
-      # Étape 8 : Analyse SonarQube (désactive-la si tu n’as pas encore le token)
+      # Étape 8 : Analyse SonarCloud (optionnelle)
       - name: SonarQube analysis
         uses: sonarsource/sonarcloud-github-action@v2
         with:
@@ -54,7 +55,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Étape 9 : Simulation de déploiement (facultatif mais bon pour les points)
+      # Étape 9 : Déploiement simulé (si tout est valide)
       - name: Deploy (simulation)
         if: success()
         run: echo "✅ Déploiement simulé après validation complète du pipeline."
