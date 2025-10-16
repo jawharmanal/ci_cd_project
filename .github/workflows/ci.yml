@@ -47,15 +47,18 @@ jobs:
       - name: Run Docker container
         run: docker run --rm ci_cd_project
 
-      # Étape 8 : Analyse SonarCloud (optionnelle)
+      # Étape 8 : Analyse SonarCloud
       - name: SonarQube analysis
         uses: sonarsource/sonarcloud-github-action@v2
         with:
           projectBaseDir: .
+          args: >
+            -Dsonar.organization=jawharmanal
+            -Dsonar.projectKey=ci_cd_project
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Étape 9 : Déploiement simulé (si tout est valide)
+      # Étape 9 : Déploiement simulé
       - name: Deploy (simulation)
         if: success()
         run: echo "✅ Déploiement simulé après validation complète du pipeline."
